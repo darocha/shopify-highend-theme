@@ -1,0 +1,93 @@
+<!-- /snippets/product-buttons.liquid -->
+
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{%- assign buybutton_setting = block.settings.enable_payment_button -%}
+{%- if product.selling_plan_groups.size > 0 -%}
+  {%- assign buybutton_setting = false -%}
+{%- endif -%}
+
+<product-form class="product__block__buttons {% if hidden %}hide{% endif %}" style="--PB: {{ block.settings.padding_bottom }}px;" {{ block.shopify_attributes }}>
+  <div data-product-form-outer>
+    {% comment %} The [data-product-form] tag distinguishes the product form from upsell instant-add-buttons. {% endcomment %}
+    {%- form 'product', product, id: uniq_id, data-product-form: '', data-product-handle: product.handle -%}
+      {%- unless hidden -%}
+        <div class="product__form__inner" data-form-inner>
+          <div class="product__submit" data-buttons-wrapper data-add-action-wrapper data-error-boundary>
+            <div data-error-display class="add-action-errors"></div>
+
+            {%- assign button_text = 'products.product.add_to_cart' | t -%}
+            {%- if product.metafields.theme.preorder.value == true -%}
+              {% comment %} Add a line item property with 'Sale type: Pre-order' and make the button say 'Pre-order'{% endcomment %}
+              <input type="hidden" data-product-preorder name="properties[{{ 'products.product.sale_type' | t }}]" value="{{ 'products.product.pre_order' | t }}">
+              {%- assign button_text =  'products.product.pre_order' | t -%}
+            {%- endif -%}
+
+            {%- unless current_variant.available -%}
+              {%- assign button_text =  'products.product.sold_out' | t -%}
+            {%- endunless -%}
+
+            <div class="product__submit__buttons{% if product.has_only_default_variant %} product__submit__buttons--clear{% endif %}">
+
+              <product-add-button>
+                <button
+                  type="submit"
+                  name="add"
+                  class="btn--outline btn--full btn--primary btn--add-to-cart"
+                  data-add-to-cart
+                  {% unless current_variant.available %} disabled="disabled" {% endunless %}>
+                  <span class="btn-state-ready">
+                    <span data-add-to-cart-text>
+                      {{ button_text }}
+                    </span>
+                    <span class="cta__dot">•</span>
+                    <span data-button-price>
+                      {%- if settings.currency_code_enable -%}
+                        {{ current_variant.price | money_with_currency }}
+                      {%- else -%}
+                        {{ current_variant.price | money }}
+                      {%- endif -%}
+                    </span>
+                  </span>
+
+                  <span class="btn-state-loading">
+                    <svg height="18" width="18" class="svg-loader">
+                      <circle r="7" cx="9" cy="9" />
+                      <circle stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
+                    </svg>
+                  </span>
+
+                  <span class="btn-state-complete">&nbsp;</span>
+                </button>
+              </product-add-button>
+
+              {%- if buybutton_setting -%}
+                <div class="product__submit__quick">
+                  {{ form | payment_button }}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+
+        {% comment %} Shop pay split payment terms {% endcomment %}
+        <div class="shop-pay-terms">{{- form | payment_terms -}}</div>
+      {%- endunless -%}
+
+      {% comment %} The input with name="id" submits to cart {% endcomment %}
+      <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+      <script data-product-json type="application/json">
+        {{ product | json }}
+      </script>
+    {%- endform -%}
+  </div>
+</product-form>
+
+
+
+
+
+
+
+
+

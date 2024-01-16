@@ -1,0 +1,82 @@
+
+
+
+@font-face {
+  font-family: "Tenor Sans";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/tenor_sans/tenorsans_n4.ef7b684f1cfa0d3a90338d1fa5f36acdf7889632.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=ad5e0758a33d222d189b282bfe3f0a0a5a6300a077e4496303f861cc9a9013db") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/tenor_sans/tenorsans_n4.514efc84ed8364b455bb5dd12e65583fe93ccf0f.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=d328c502a12e0b69e7b7c3645a8874c8793174d92faccc1c1fddfd4123a3388f") format("woff");
+}
+
+@font-face {
+  font-family: "Harmonia Sans";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n4.73cf0589f7839ec88463a09f5335a2885467ed0c.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=81f5a606415134f6c9fc876870ab84fb06a461ac2bf2f6381185373ef9720c8a") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n4.1c5276ef69780b63aa8f0ba7897fb3bc87270bb0.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=44401d452912c0b029a4d35ff5132fb2029a590a35ff827e03fdac4201c71589") format("woff");
+}
+
+@font-face {
+  font-family: "Harmonia Sans";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n4.73cf0589f7839ec88463a09f5335a2885467ed0c.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=81f5a606415134f6c9fc876870ab84fb06a461ac2bf2f6381185373ef9720c8a") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n4.1c5276ef69780b63aa8f0ba7897fb3bc87270bb0.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=44401d452912c0b029a4d35ff5132fb2029a590a35ff827e03fdac4201c71589") format("woff");
+}
+
+
+
+
+
+  @font-face {
+  font-family: "Harmonia Sans";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n6.dd3d6084d29e4754e80fe6aa1c0e37f511474ffa.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=19c52db924aaa76a7f894bef20500a11fc2d7c6059a90fa08304b0dc43c1c319") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n6.b0d6879084373b473d0c7a4c3d54ece9c289cbb4.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=8a50866af6d6bba6dcd568fb66cef17ad63144c47f4e5c75f14b12e50dad2d37") format("woff");
+}
+
+
+
+
+  @font-face {
+  font-family: "Harmonia Sans";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n6.dd3d6084d29e4754e80fe6aa1c0e37f511474ffa.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=19c52db924aaa76a7f894bef20500a11fc2d7c6059a90fa08304b0dc43c1c319") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_n6.b0d6879084373b473d0c7a4c3d54ece9c289cbb4.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=8a50866af6d6bba6dcd568fb66cef17ad63144c47f4e5c75f14b12e50dad2d37") format("woff");
+}
+
+
+
+
+
+
+
+  @font-face {
+  font-family: "Harmonia Sans";
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_i4.ccbfea79fd847e76d49925a923aa89064359e629.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=fae977f4b27eeb017471c5b13743c47f8bd57f02c293128c4e0932a74ae47241") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_i4.e5c05a10aacfb8cc7fdf892df8dba937a214e6e7.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=3ec68b791efc65918365b2cf543f2e86521115334b5cf92ef9a6023aaed3fe9f") format("woff");
+}
+
+
+
+  @font-face {
+  font-family: "Harmonia Sans";
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+  src: url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_i6.d520474355816f56169b3a79baa14d2c479da2ba.woff2?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=a6cdf6191ea9d6072704ffc16d447c3ae45284abd437d4f9d285b8a6cbad9bf2") format("woff2"),
+       url("//highendaesthetics.com/cdn/fonts/harmonia_sans/harmoniasans_i6.5ea0fa072a0601a91bbd7e0301549f9159a09ada.woff?h1=ZTYzZTgyLTIuYWNjb3VudC5teXNob3BpZnkuY29t&h2=aGlnaGVuZGFlc3RoZXRpY3MubXlzaG9waWZ5LmNvbQ&h3=aGlnaGVuZGFlc3RoZXRpY3MuY29t&hmac=ea3192737e42489d745a864e7d044e1ac09e1335a8324ac1969c0ca7b10ed0ac") format("woff");
+}
+
+

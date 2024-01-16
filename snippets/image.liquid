@@ -1,0 +1,143 @@
+<!-- /snippets/image.liquid -->
+
+{% comment %}
+  * A thin wrapper around Shopify's image_tag, but with the addition of handling for wh_ratio, placeholders for blank images, etc
+
+  *  img_object {object}- The Image we will use
+  *  class {string} - CSS classes to add to <img> tag
+  *  cover {boolean} - Whether image should be cropped to "cover" it's parent or maintain it's natural aspect ratio
+  *  wh_ratio {float} - The aspect ratio of the image in the format {ratio}:1
+  *  alt {string} - Default alt text to use if no alt text is provided
+  *  srcset {string} - Source set for <img> tag
+  *  sizes {string} - Sizes for <img> tag
+  *  placeholder {string, false} - Which placeholder to use if img is blank (see https://shopify.dev/api/liquid/filters/placeholder_svg_tag for options)
+
+  {% render 'image', img_object: section.settings.image, wh_ratio: section.settings.wh_ratio %}
+{% endcomment %}
+
+{%- liquid
+  assign image = img_object
+
+  if cover != false
+    assign cover = true
+  endif
+
+  # removing a focal point does not reset the value to nil, so we need to check for the default value
+  assign focal = image.presentation.focal_point | default: '50.0% 50.0%'
+  if focal == '50.0% 50.0%'
+    assign focal = nil
+  endif
+  assign bg_position_setting = bg_position | replace: '-', ' ' | default: "center center"
+  assign focal_or_setting =  focal | default: bg_position_setting
+
+  if wh_ratio != false and wh_ratio != blank
+    assign wh_ratio = wh_ratio | default: image.aspect_ratio | default: 0.5
+  endif
+
+  assign width = width | default: image.width
+  assign fetchpriority = fetchpriority | default: 'auto'
+  assign loading = loading | default: 'lazy'
+  assign loading_animation = loading_animation | default: true
+
+  if placeholder != false
+    assign placeholder = placeholder | default: 'image'
+  endif
+
+  assign alt = alt | default: image.alt | strip_html | escape
+-%}
+
+{% capture class %}
+  {% if loading_animation %}
+    loading-shimmer
+  {% endif %}
+  {{ class }}
+{% endcapture %}
+
+{% capture default_srcset %}
+  {% render 'image-default-srcset', image: image %}
+{% endcapture %}
+
+{% capture style %}
+  {% if wh_ratio != 0 and wh_ratio != blank %}
+    aspect-ratio: {{ wh_ratio }};
+  {% endif %}
+  object-position: {{ focal_or_setting }};
+  {{ style }}
+{% endcapture %}
+
+{%- assign srcset = srcset | default: default_srcset -%}
+
+{% if image != blank %}
+  {% capture class %}
+    {% if cover == true %}
+      tw-block tw-overflow-hidden tw-object-cover tw-w-full tw-h-full
+    {% else %}
+      tw-block tw-overflow-hidden tw-object-contain tw-w-full tw-h-full
+    {% endif %}
+
+    {% if loading_animation %}
+      loading-shimmer
+    {% endif %}
+
+    {{ class }}
+  {% endcapture %}
+
+  {{ image | image_url: width: width | image_tag:
+    class: class,
+    alt: alt,
+    preload: preload,
+    srcset: srcset,
+    sizes: sizes,
+    loading: loading,
+    fetchpriority: fetchpriority,
+    style: style
+  }}
+{% else %}
+  {% capture style %}
+    {% if wh_ratio != 0 and wh_ratio != blank %}
+      aspect-ratio: {{ wh_ratio }};
+    {% endif %}
+  {% endcapture %}
+
+  {% capture svg_class %}
+    tw-block tw-absolute tw-inset-0
+    {% if cover == true %}
+      tw-w-full
+      tw-h-full
+    {% else %}
+      tw-mx-auto
+      tw-max-h-full
+    {% endif %}
+    tw-bg-[var(--hairline)]
+    tw-fill-[#B4B6B9]
+    placeholder-svg
+  {% endcapture %}
+
+  <div class="tw-relative tw-block tw-w-full tw-h-full tw-overflow-hidden {{ class }}" style="{{ style }}" role='img' aria-label="{{ alt }}">
+    {% if placeholder %}
+      {% capture svg_tag %}
+        {{ placeholder | placeholder_svg_tag: svg_class }}
+      {% endcapture %}
+
+      {% capture svg_aspect_ratio %}
+        {% if cover == true %}
+          xMidYMid slice
+        {% else %}
+          meet
+        {% endif %}
+      {% endcapture %}
+
+      {% capture svg_tag_open %}
+        <svg preserveAspectRatio="{{ svg_aspect_ratio }}"
+      {% endcapture %}
+
+      {% comment %} Manually splice in attributes neccesary for an SVG to mimic `object-fit: cover or contain` {% endcomment %}
+      {% assign parts = svg_tag | split: "<svg" %}
+      {{ parts[0] | prepend: svg_tag_open }}
+      {{ parts[1] }}
+    {% else %}
+      <svg preserveAspectRatio="xMidYMid slice" class="{{ svg_class }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 525.5 525.5">
+      </svg>
+    {% endif %}
+  </div>
+{% endif %}

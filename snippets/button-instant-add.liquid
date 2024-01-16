@@ -1,0 +1,70 @@
+<!-- /snippets/button-instant-add.liquid -->
+
+{% comment %}
+  * An button that adds a variant to cart
+
+  {% render 'button-instant-add', variant: variant, selling_plan: selling_plan, text: 'add to cart', class: 'btn btn--soft' %}
+{% endcomment %}
+
+{%- liquid
+  assign product = variant.product
+  unless default_text
+    if product.metafields.theme.preorder.value == true
+      assign default_text = 'products.general.clip_pre_order' | t
+    else
+      assign default_text = 'products.general.clip_add_to_cart' | t
+    endif
+  endunless
+  assign button_text = text | default: default_text
+  assign button_class = class | default: 'btn btn--soft btn--small'
+  unless variant.available
+    assign button_class = button_class | append: ' sold-out'
+  endunless
+-%}
+
+{%- form 'product', product -%}
+
+  {% comment %} This input determines which variant is added {% endcomment %}
+  <input type="hidden" name="id" value="{{ variant.id }}">
+
+  {%- if selling_plan -%}
+    {% comment %} Add the selling plan if  passed in {% endcomment %}
+    <input type="hidden" name="selling_plan" value="{{ selling_plan.id }}">
+  {%- endif -%}
+
+  {% comment %} This will add a line item property with 'Sale type: Pre-order' to preorder products  {% endcomment %}
+  {%- if product.metafields.theme.preorder.value == true -%}
+     <input type="hidden" data-product-preorder name="properties[{{ 'products.product.sale_type' | t }}]" value="{{ 'products.product.pre_order' | t }}">
+  {% endif %}
+
+  {% comment %} This will add a line item property with 'Color: {{ Cutline }}' to sibling products without a color in the title {% endcomment %}
+  {%- assign cutline = product.metafields.theme.cutline.value -%}
+  {%- if cutline and settings.show_siblings -%}
+    {%- if product.metafields.theme.siblings.value != blank and product.metafields.theme.siblings.type == 'single_line_text_field' -%}
+      {%- assign title_down = product.title | downcase -%}
+      {%- assign cutline_down = cutline | downcase -%}
+      {%- unless title_down contains cutline_down -%}
+        <input type="hidden" name="properties[{{ 'general.siblings.label' | t }}]" value="{{ cutline }}">
+      {%- endunless -%}
+    {%- endif -%}
+  {%- endif -%}
+
+  <product-add-button>
+    <button
+      data-add-to-cart
+      type="submit"
+      name="add"
+      class="{{ button_class }}"
+      {% unless variant.available %} disabled="disabled" {% endunless %}
+    >
+      <span class="btn-state-ready"> {{ button_text }} </span>
+      <span class="btn-state-loading">
+        <svg height="18" width="18" class="svg-loader">
+          <circle r="7" cx="9" cy="9" />
+          <circle stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
+        </svg>
+      </span>
+      <span class="btn-state-complete">&nbsp;</span>
+    </button>
+  </product-add-button>
+{%- endform -%}

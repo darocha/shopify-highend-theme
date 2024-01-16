@@ -1,0 +1,376 @@
+<!-- /snippets/product-grid-item-variant.liquid -->
+
+{% comment %}
+  Inner content for a grid item
+{% endcomment %}
+
+{%- liquid
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  assign sold_out = true
+  if product.available
+    assign sold_out = false
+  endif
+
+  assign sellout_badge = false
+  if sold_out and settings.badge_sellout
+    assign sellout_badge = true
+  endif
+
+  assign sale_badge = false
+  if on_sale and settings.badge_sale
+    assign sale_badge = true
+    assign sale_badge_content = 'products.product.sale' | t
+    if settings.badge_sale_discount
+      if settings.badge_sale_type == 'dollar'
+        if settings.currency_code_enable
+          assign sale_badge_content = product.compare_at_price | minus: product.price | money_with_currency
+        else
+          assign sale_badge_content = product.compare_at_price | minus: product.price | money_without_trailing_zeros
+        endif
+      else
+        assign difference = product.compare_at_price | minus: product.price
+        assign percent_off = difference | times: 1.0 | divided_by: product.compare_at_price | times: 100
+        assign sale_badge_content = percent_off | floor | append: '%'
+      endif
+      assign save_word = 'products.product.save' | t | append: ' '
+      assign sale_badge_content = sale_badge_content | prepend: save_word
+    endif
+  endif
+
+  assign custom_badge = false
+  if settings.badge_custom
+    if product.metafields.theme.badge != blank and product.metafields.theme.badge.type == 'single_line_text_field'
+      assign custom_badge = true
+      assign custom_badge_content = product.metafields.theme.badge.value
+    endif
+    for tag in product.tags
+      if tag contains "_badge_"
+        assign tag_content = tag | remove: '_badge_' | replace: '_', ' '
+         if tag_content != ''
+          assign custom_badge = true
+          assign custom_badge_content = tag_content
+         endif
+        break
+      endif
+    endfor
+  endif
+
+  if badge_string and badge_string != ''
+    assign custom_badge = true
+    assign custom_badge_content = badge_string
+  endif
+
+  assign tagged = false
+  if sellout_badge or sale_badge or custom_badge
+    assign tagged = true
+  endif
+
+  comment
+    Disqualify options that have more than 15 variants or are a combined length of > 90 characters
+  endcomment
+  if inline_variant_buttons.values.size > 15
+    assign inline_variant_buttons = nil
+  endif
+
+  if inline_variant_buttons
+    assign all_characters = inline_variant_buttons.values | join: ""
+    if all_characters.size >= 90
+      assign inline_variant_buttons = nil
+    endif
+  endif
+
+  # Sellign plans can be added along with inline or instand buttons if
+  # the product has exactly 1 selling plan with subscriptions required
+  assign simple_selling_plan = nil
+
+  if inline_variant_buttons or instant_add_button
+    if product.requires_selling_plan and product.selling_plan_groups.size == 1 and product.selling_plan_groups[0].selling_plans.size == 1
+      # one variant, one required subscription, no choices to make
+      assign simple_selling_plan = product.selected_or_first_available_selling_plan_allocation.selling_plan
+    elsif product.selling_plan_groups.size > 0
+      # Abort instant and inline add buttons, subs choices must be made
+      assign inline_variant_buttons = nil
+      assign instant_add_button = nil
+    endif
+  endif
+
+  # Catch case where first sibling has inline variants and subsequent do not
+  if product.has_only_default_variant and inline_variant_buttons
+    assign inline_variant_buttons = nil
+    assign instant_add_button = true
+  endif
+
+  comment
+    Display inline buttons in a compact format if the buttons
+    have a lot of characters or options
+  endcomment
+  assign compact_buttons_class = ""
+  if inline_variant_buttons
+    assign all_characters = inline_variant_buttons.values | join: ""
+    if all_characters.size > 30 and inline_variant_buttons.values.size > 5
+      assign compact_buttons_class = "inline-add-product__options-menu-list--compact"
+    elsif inline_variant_buttons.values.size > 10
+      assign compact_buttons_class = "inline-add-product__options-menu-list--compact"
+    endif
+  endif
+
+  assign section_width = section_width | default: section.settings.width
+-%}
+{%- capture badge -%}
+  {%- if tagged %}
+    {%- if custom_badge -%}
+      <div class="product__badge product__badge--custom product__badge--{{ custom_badge_content | strip_html | handle }}">{{ custom_badge_content }}</div>
+    {%- elsif sellout_badge -%}
+      <div class="product__badge product__badge--sold">{{ 'products.product.sold_out' | t }}</div>
+    {%- elsif sale_badge -%}
+      <div class="product__badge product__badge--sale">{{ sale_badge_content }}</div>
+    {%- endif -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign first_image = product.media[0].preview_image
+  assign container_wh_ratio = settings.product_card_wh_ratio
+  assign image_cover = true
+
+  case settings.product_grid_image
+  when 'crop'
+    assign image_wh_ratio = container_wh_ratio
+  when 'uneven'
+    assign container_wh_ratio = first_image.aspect_ratio | default: settings.product_card_wh_ratio
+  when 'scale'
+    assign image_cover = false
+    assign image_wh_ratio = first_image.aspect_ratio | default: settings.product_card_wh_ratio
+  endcase
+
+
+  case settings.product_grid_image
+  when 'crop'
+    assign image_wh_ratio = container_wh_ratio
+  when 'uneven'
+    assign container_wh_ratio = first_image.aspect_ratio | default: settings.product_card_wh_ratio
+  when 'scale'
+    assign image_cover = false
+    assign image_wh_ratio = first_image.aspect_ratio | default: settings.product_card_wh_ratio
+  endcase
+
+  # Behavior is inferred based on setting and passed into JS
+  assign image_hover = 'disabled'
+  assign images_limit = settings.cycle_images_limit
+  case images_limit
+  when 1
+    assign image_hover = 'disabled'
+  when 2
+    assign image_hover = 'second_immediately'
+  else
+    assign image_hover = 'cycle_images'
+  endcase
+-%}
+
+<product-grid-item-variant
+  class="
+    product-grid-item__content{% if on_sale %} on-sale{% endif %}
+    {% if sold_out %} sold-out{% endif %}
+    {% if tagged %} tagged{% endif %}
+    {% comment %} only used to hide badge on hover {% endcomment %}
+    {% if image_hover == 'cycle_images' %} is-slideshow{% endif %}
+  "
+  data-grid-item="{{ product.id }}"
+  data-slideshow-style="{{ image_hover }}"
+  data-grid-item-variant="{{ variant.id }}"
+  {% if visible != true %} hidden {% endif %}
+  aria-label="{{ variant.title }}"
+  tabindex="0"
+>
+  <div class="product-grid-item__container" data-error-boundary>
+    <div data-error-display class="product-grid-item__error-display">&nbsp;</div>
+    <a href="{{ product.url | within: collection }}" data-grid-link aria-label="{{ product.title | strip_html | escape }}">
+      <div
+        class="product-grid-item__images"
+          data-grid-images data-grid-slide
+        style="
+          aspect-ratio: {{ container_wh_ratio }};
+        "
+      >
+        {%- if product.media.size > 0 -%}
+          {%- assign image_index = 0 -%}
+          {%- for media in product.media -%}
+            {%- liquid
+              # Use a manual count continue past the limit to find variant image
+              if image_index > images_limit
+                if variant.featured_media.id != media.id
+                  continue
+                endif
+              endif
+
+              assign img_object = media.preview_image
+              assign class = "product-grid-item__image"
+              assign loading = 'lazy'
+              assign fetchpriority = "low"
+              assign visible = false
+              assign active_class = 'is-active'
+              assign is_variant_featured_media = false
+              assign preload_image = false
+
+              if variant.featured_media and media.id == variant.featured_media.id
+                # Variant image is not necessarily first image or default image
+                assign is_variant_featured_media = true
+              endif
+
+              if is_variant_featured_media and product.selected_variant.id == variant.id
+                # Show variant image is there is a collection filter applied
+                assign visible = true
+              elsif image_index == 0
+                # If no filters are active show the first image first
+                assign visible = true
+              endif
+
+              if visible
+                assign fetchpriority = "high"
+
+                if preload
+                  assign preload_image = true
+                  assign loading = 'eager'
+                endif
+              endif
+
+              if position <= eager_load_count
+                assign loading = 'eager'
+              endif
+            %}
+
+            {%- capture sizes -%}
+              {%- render 'image-grid-sizes',
+                columns_desktop: section.settings.grid_large,
+                columns_tablet: section.settings.grid_large,
+                columns_mobile: section.settings.grid_mobile,
+                section_width: section_width
+              %}
+            {%- endcapture -%}
+
+            {%- capture srcset -%}
+              {%- render 'image-grid-srcset',
+                image: img_object,
+                columns_desktop: section.settings.grid_large,
+                columns_tablet: section.settings.grid_large,
+                columns_mobile: section.settings.grid_mobile,
+                section_width: section_width,
+                wh_ratio: image_wh_ratio,
+                crop: 'center'
+              %}
+            {%- endcapture -%}
+
+            {% comment %} Use a template to prevent hidden images from loading until user begins slideshow{% endcomment %}
+            <product-grid-item-image
+              class="
+                product-grid-item__image-wrapper
+                {% if visible %}{{ active_class }}{% endif %}
+              "
+              data-grid-image="{{ image_index }}"
+              data-grid-image-target="{{ media.id }}"
+              data-variant-id="{{ }}"
+              loading="{{ loading }}"
+              {% if visible %}data-grid-current-image{% endif %}
+              {% if is_variant_featured_media and visible %}
+                data-slide-for-filter-selected-variant
+              {% endif %}
+              {% if is_variant_featured_media %}
+                data-slide-for-variant-media
+              {% endif %}
+            >
+              {% unless visible %}<template>{% endunless %}
+              {% render 'image',
+                cover: image_cover,
+                img_object: img_object,
+                class: class,
+                sizes: sizes,
+                srcset: srcset,
+                preload: preload_image,
+                loading: loading,
+                fetchpriority: fetchpriority,
+                wh_ratio: image_wh_ratio,
+                placeholder: placeholder
+              %}
+              {% unless visible %}</template>{% endunless %}
+            </product-grid-item-image>
+            {%- assign image_index = image_index | plus: 1 -%}
+          {%- endfor -%}
+        {% else %}
+          <div class="product-grid-item__image-wrapper is-active">
+            {% render 'image',
+              cover: image_cover,
+              img_object: null,
+              class: class,
+              placeholder: placeholder,
+              wh_ratio: image_wh_ratio
+            %}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {{ badge }}
+    </a>
+
+    {%- if instant_add_button %}
+      {% comment %} Allow for shorter default text on longer translations {% endcomment %}
+      {%- if product.metafields.theme.preorder.value == true -%}
+        {%- assign default_text = 'products.general.instant_add_pre_order' | t -%}
+      {%- else -%}
+        {%- assign default_text = 'products.general.instant_add' | t -%}
+      {%- endif -%}
+      <div class="product-grid-item__actions">
+        {% render 'button-instant-add', variant: variant, selling_plan: simple_selling_plan, text: button_text, default_text: default_text, class: 'product-grid-item__btn' %}
+      </div>
+    {%- elsif inline_variant_buttons %}
+      <inline-add-product class="product-grid-item__actions">
+        <div aria-hidden class="inline-add-product__button-facade-wrapper product-grid-item__btn">
+          <div class="inline-add-product__button-facade-label">
+            {{ 'products.general.inline_add' | t }}
+          </div>
+        </div>
+        <div class="inline-add-product__options-menu">
+          <ul class="inline-add-product__options-menu-list {{ compact_buttons_class }}">
+            {% assign variant_position_index0 = inline_variant_buttons.position | minus: 1 %}
+            {%- for quick_variant in inline_variants -%}
+              {%- assign option_name = quick_variant.options[variant_position_index0] -%}
+              <li class="inline-add-product__options-menu-list-item">
+                {% render 'button-instant-add', variant: quick_variant, selling_plan: simple_selling_plan, text: option_name, class: 'inline__variant__add product-grid-item__btn inline-add-product__options-menu-list-item-button' %}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      </inline-add-product>
+    {%- elsif settings.quickview_enable -%}
+      <product-quickview class="product-grid-item__actions" data-quickview="{{ product.id }}">
+        <div data-quickview-holder="{{ product.id }}" data-add-action-wrapper>
+          <button type="button" class="product-grid-item__btn" data-popup-{{ product.id }}="{{ product.handle }}">
+            <span class="btn-state-ready">
+              {{ 'products.general.quick_view' | t }}
+            </span>
+            <span class="btn-state-loading">
+              <svg height="18" width="18" class="svg-loader">
+                <circle r="7" cx="9" cy="9" />
+                <circle stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
+              </svg>
+            </span>
+          </button>
+
+          <script data-quickview-modal-template type="text/x-template">
+            <div class="drawer drawer--right quickview__modal" data-quickview-modal data-form-holder id="{{ product.id }}" aria-hidden="true">
+              <div class="drawer__content" data-product-quickview-ajax></div>
+
+              <span class="drawer__underlay" data-micromodal-close tabindex="-1">
+                <span class="drawer__underlay__fill"></span>
+                <span class="drawer__underlay__blur"></span>
+              </span>
+            </div>
+          </script>
+        </div>
+      </product-quickview>
+    {%- endif -%}
+  </div>
+</product-grid-item-variant>
